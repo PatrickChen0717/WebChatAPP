@@ -1,0 +1,41 @@
+.message{
+    background-color: rgb(172, 200, 251);
+    border-radius: 3px;
+    text-align: left;
+    font-size: 30px;
+    margin: 30px;
+    padding: 10px;
+    width: 40%;
+}
+
+.my-message{
+    background-color: cornflowerblue;
+    border-radius: 3px;
+    text-align: right;
+    font-size: 30px;
+    margin: 30px;
+    margin-left: calc(60% - 60px);
+    padding: 10px;
+    width: 40%;
+}
+
+.page-control{
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+}
+
+.page-control button{
+    background-color: cornflowerblue;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+button:hover{  
+    background-color: rgb(172, 200, 251);
+}

@@ -1,6 +1,5 @@
 body{
     margin: 0%;
-    background-color:ivory;
 }
 
 #app-menu{
@@ -59,38 +58,25 @@ body{
 }
 
 
-.room-name{
-    border: 2px solid rgb(49, 49, 49);
-    background-color: rgb(255, 255, 255);
-    margin: 0px;
-    padding: 5px;
-    font-size: 15px;
+.profile-form{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:left;
+    
 }
 
-.message{
-    background-color: rgb(172, 200, 251);
-    border-radius: 3px;
-    text-align: left;
-    font-size: 30px;
-    margin: 30px;
-    padding: 10px;
-    width: 40%;
+.profile-form div{
+    padding-left: 2%;
+    padding-top:4%;
+    padding-bottom:4%;
 }
 
-.my-message{
-    background-color: cornflowerblue;
-    border-radius: 3px;
-    text-align: right;
-    font-size: 30px;
-    margin: 30px;
-    margin-left: calc(60% - 60px);
-    padding: 10px;
-    width: 40%;
-}
+
+
+
 
 .page-control{
-    display: flex;
-    flex-direction: row;
     text-align: center;
     vertical-align: middle;
     position: absolute;
@@ -110,7 +96,6 @@ body{
     border: none;
     color: rgb(0, 0, 0);
     padding: 10px 15px;
-    margin-left:3%;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
@@ -119,4 +104,3 @@ body{
 button:hover{  
     background-color: rgb(172, 200, 251);
 }
-

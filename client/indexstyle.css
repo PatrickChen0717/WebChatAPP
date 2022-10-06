@@ -1,24 +1,50 @@
-#app-menu{
-    padding-left: 0;
+body{
+    margin: 0%;
 }
 
-#app-menu li::before {
-    content: '';
+#app-menu{
+    padding-left: 0;
+    margin: 0%;
+    display: flex;
+    flex-direction: row;
+}
+
+#app-menu #Rooms::before {
     display: inline-block;
+    content: '';
     height: 40px;
     width: 40px;
     background-size: cover;
     background-image: url('./assets/chat-icon.png');
+    -webkit-filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1);
+    margin-right: 20px;
+    vertical-align: middle;
+}
+
+#app-menu #Profile::before {
+    display: inline-block;
+    content: '';
+    height: 40px;
+    width: 40px;
+    background-size: cover;
+    background-image: url('./assets/profile-icon.png');
+    -webkit-filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1);
     margin-right: 20px;
     vertical-align: middle;
 }
 
 #app-menu li{  
+    display: inline-block;
     background-color: cornflowerblue;
     text-align: center;
+    width: 50%;
     justify-content:center;
     color:aliceblue;
+    padding: 10px;
     font-size: 25px;
+    margin: 0%;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
@@ -35,41 +61,10 @@
     text-align: center;
 }
 
-#app-menu{
-    padding-left: 0;
-}
-
-#app-menu li::before {
-    content: '';
-    display: inline-block;
-    height: 40px;
-    width: 40px;
-    background-size: cover;
-    background-image: url('./assets/chat-icon.png');
-    overflow:hidden;
-    vertical-align: middle;
-}
-
-#app-menu li{  
-    background-color: cornflowerblue;
-    text-align: center;
-    justify-content:center;
-    padding: 10px;
-    color:aliceblue;
-    font-size: 25px;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
-#app-menu a{  
-    vertical-align: middle;
-}
-
-#app-menu li:hover{  
-    background-color: rgb(172, 200, 251);
-}
 
 .room-list{
     padding-left: 0;
+    margin: 0;
 }
 
 .room-list li::before {
@@ -105,6 +100,12 @@
 
 .page-control{
     text-align: center;
+    vertical-align: middle;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 3%;
+    background-color: cornflowerblue;
 }
 
 .page-control button::before {
@@ -119,9 +120,9 @@
 }
 
 .page-control button{
-    background-color: cornflowerblue;
+    background-color: rgb(255, 255, 255);
     border: none;
-    color: white;
+    color: rgb(0, 0, 0);
     padding: 10px 15px;
     text-decoration: none;
     display: inline-block;

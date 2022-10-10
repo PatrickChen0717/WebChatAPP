@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script src="http://52.43.220.29/cpen322/test-a1.js" type="text/javascript"></script>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="profilestyle.css">
+        <link rel="stylesheet" href="style.css">
         <title>CPEN322 Project</title>
     </head>
 
     <body>
         <div id="app-view" >
             <ul id="app-menu">
-                <li class="menu-item" id="Rooms">Rooms
-                    <a href="/"></a>
+                <li class="menu-item" id="Header1">
+                    <a href="/" id="Rooms">Rooms</a>
                 </li>
-                <li class="menu-item" id="Profile">Profile
-                    <a href="/profile"></a>
+                <li class="menu-item" id="Header2">
+                    <a href="/profile" id="Profile">Profile</a>
                 </li>
             </ul>
 
@@ -31,12 +32,13 @@
                         </div>
                         <div class="form-field">
                             <label>Avatar Image</label>
+                            <img src="assets/profile-icon.png">
                             <input type="file">
                         </div>
                     </div>
 
                     <div class="page-control">
-                        <button>Save</button>
+                        <button class="profileBtn">Save</button>
                     </div>
                     
                 </div>
@@ -44,3 +46,4 @@
         </div>
   </body>
 </html>
+

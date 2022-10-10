@@ -1,0 +1,252 @@
+body{
+    margin: 0%;
+}
+
+#app-menu{
+    padding-left: 0;
+    margin: 0%;
+    display: flex;
+    flex-direction: row;
+}
+
+#app-menu #Rooms::before {
+    display: inline-block;
+    content: '';
+    height: 40px;
+    width: 40px;
+    background-size: cover;
+    background-image: url('./assets/chat-icon.png');
+    -webkit-filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1);
+    margin-right: 20px;
+    vertical-align: middle;
+}
+
+#app-menu #Profile::before {
+    display: inline-block;
+    content: '';
+    height: 40px;
+    width: 40px;
+    background-size: cover;
+    background-image: url('./assets/profile-icon.png');
+    -webkit-filter: brightness(0) invert(1);
+    filter: brightness(0) invert(1);
+    margin-right: 20px;
+    vertical-align: middle;
+}
+
+#app-menu li{  
+    display: inline-block;
+    background-color: cornflowerblue;
+    text-align: center;
+    width: 50%;
+    justify-content:center;
+    padding: 10px;
+    margin: 0%;
+    
+}
+
+#app-menu a{  
+    text-decoration: none;
+    vertical-align: middle;
+    font-size: 25px;
+    color:aliceblue;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+#app-menu li:hover > #Rooms::before{
+    filter: invert(1) opacity(0.6) drop-shadow(0 0 0 gold); 
+}
+
+#app-menu li:hover > #Profile::before{
+    filter: invert(1) opacity(0.6) drop-shadow(0 0 0 gold); 
+}
+
+#app-menu li:hover{  
+    background-color: rgb(172, 200, 251);
+
+}
+
+#app-menu li:hover > a{
+    color:gold;
+}
+
+.page-control{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    vertical-align: middle;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 3%;
+    background-color: cornflowerblue;
+}
+
+button:hover{  
+    background-color: rgb(172, 200, 251);
+    color: whitesmoke;
+}
+
+/*--------------Index CSS---------------*/
+
+
+.room-list{
+    padding-left: 0;
+    margin: 0;
+}
+
+.room-list li{  
+    background-color: rgb(255, 255, 255);
+    justify-content:center;
+    padding: 10px;
+    font-size: 20px;
+}
+
+.room-list a{  
+    vertical-align: middle;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color:rgb(20, 20, 20);
+    text-decoration:none;
+}
+
+.room-list li:hover{  
+    background-color: rgb(208, 224, 253);
+}
+
+img{
+    height: 30px;
+    width: 35px;
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.indexBtn::before {
+    content: '';
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+    background-size: cover;
+    background-image: url('./assets/add-icon.png');
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.indexBtn:hover ::before {
+    filter: invert(1) opacity(0.6) drop-shadow(0 0 0 gold); 
+}
+
+.indexBtn{
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 10px 15px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.page-control input{
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 3px;
+    border-width: 5px;
+    border-color:  rgb(172, 200, 251);
+
+}
+
+
+/*----------Chat CSS----------*/
+.room-name{
+    border: 2px solid rgb(49, 49, 49);
+    background-color: rgb(255, 255, 255);
+    margin: 0px;
+    padding: 5px;
+    font-size: 15px;
+}
+
+.message{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(172, 200, 251);
+    border-radius: 3px;
+    text-align: left;
+    margin: 30px;
+    padding: 10px;
+    width: 40%;
+}
+
+.my-message{
+    background-color: cornflowerblue;
+    border-radius: 3px;
+    margin: 30px;
+    margin-left: calc(60% - 60px);
+    padding: 10px;
+    width: 40%;
+}
+
+.message-text{
+    text-align: left;
+    font-size: 30px;
+}
+
+
+.page-control textarea{
+    width: 70%;
+}
+
+.chatBtn{
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 10px 15px;
+    margin-left:3%;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+/*---------------Profile CSS---------------*/
+
+.profile-form{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:left;
+    
+}
+
+.profile-form div{
+    padding-left: 2%;
+    padding-top:4%;
+    padding-bottom:4%;
+}
+
+.profileBtn{
+    background-color: rgb(255, 255, 255);
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 10px 15px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+
+
+/*--------------Media Query--------------*/
+@media only screen and (min-width: 1024px) {
+    #app-view {
+      width: 80%;
+    }
+}
+@media only screen and (max-width: 1024px) and (min-width: 768px) {
+    #app-view {
+      width: 90%;
+    }
+}
+@media only screen and (max-width: 768px) {
+    #app-view {
+      width: 100%;
+    }
+}

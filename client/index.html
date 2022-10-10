@@ -1,38 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script src="http://52.43.220.29/cpen322/test-a1.js" type="text/javascript"></script>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="indexstyle.css">
+        <link rel="stylesheet" href="style.css">
         <title>CPEN322 Project</title>
     </head>
 
     <body>
         <div id="app-view" >
             <ul id="app-menu">
-                <li class="menu-item" id="Rooms">Rooms
-                    <a href="/"></a>
+                <li class="menu-item" id="Header1">
+                    <a href="/" id="Rooms">Rooms</a>
                 </li>
-                <li class="menu-item" id="Profile">Profile
-                    <a href="/profile"></a>
+                <li class="menu-item" id="Header2">
+                    <a href="/profile" id="Profile">Profile</a>
                 </li>
             </ul>
 
             <div id="page-view" >
                 <div class="content" >
                     <ul class="room-list" >
-                        <li><a href="/chat"></a>Everyone in CPEN400A</li>
-                        <li><a href="/chat"></a>Everyone in CPEN400A</li>
-                        <li><a href="/chat"></a>Everyone in CPEN400A</li>
-                        <li><a href="/chat"></a>Everyone in CPEN400A</li>
+                        <li>
+                            <img src="assets/everyone-icon.png">
+                            <a href="/chat">Everyone in CPEN400A</a>
+                        </li>
+                        <li>
+                            <img src="assets/minecraft.jpg">
+                            <a href="/chat">Minecraft</a>
+                        </li>
+                        <li>
+                            <img src="assets/canucks.png">
+                            <a href="/chat">Canucks</a>
+                        </li>
+                        <li>
+                            <img src="assets/bibimbap.jpg">
+                            <a href="/chat">Bibimbap</a>
+                        </li>
                     </ul>
 
                     <div class="page-control">
                         <input type="text" placeholder="New Room Name">
-                        <button>Add Room</button>
+                        <button class="indexBtn">Add Room</button>
                     </div> 
                 </div>
             </div>
         </div>
   </body>
+
 </html>
+

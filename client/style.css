@@ -1,5 +1,5 @@
 body{
-    margin: 0%;
+    margin:0;
 }
 
 #app-menu{
@@ -43,7 +43,6 @@ body{
     justify-content:center;
     padding: 10px;
     margin: 0%;
-    
 }
 
 #app-menu a{  
@@ -64,7 +63,6 @@ body{
 
 #app-menu li:hover{  
     background-color: rgb(172, 200, 251);
-
 }
 
 #app-menu li:hover > a{
@@ -75,11 +73,10 @@ body{
     display: flex;
     flex-direction: row;
     justify-content: center;
-    vertical-align: middle;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
+    align-items: center;
+    height: 5%;
     padding: 3%;
+    margin-top: auto;
     background-color: cornflowerblue;
 }
 
@@ -91,9 +88,15 @@ button:hover{
 /*--------------Index CSS---------------*/
 
 
-.room-list{
-    padding-left: 0;
-    margin: 0;
+ul.room-list{
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    padding-left: 0; 
+    margin:0;
+    margin-bottom: auto;
+    height: 90%;
+
 }
 
 .room-list li{  
@@ -142,13 +145,11 @@ img{
     color: rgb(0, 0, 0);
     padding: 10px 15px;
     text-decoration: none;
-    display: inline-block;
     font-size: 16px;
 }
 
 .page-control input{
     text-decoration: none;
-    display: inline-block;
     border-radius: 3px;
     border-width: 5px;
     border-color:  rgb(172, 200, 251);
@@ -190,6 +191,10 @@ img{
     font-size: 30px;
 }
 
+.message-list{
+    min-height: 73vh;
+    margin-bottom: auto;
+}
 
 .page-control textarea{
     width: 70%;
@@ -209,11 +214,12 @@ img{
 /*---------------Profile CSS---------------*/
 
 .profile-form{
+    min-height: 83vh;
     display:flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content:flex-start;
     align-items:left;
-    
+    margin-bottom: auto;
 }
 
 .profile-form div{
@@ -250,3 +256,4 @@ img{
       width: 100%;
     }
 }
+

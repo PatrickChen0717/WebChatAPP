@@ -193,6 +193,7 @@ img{
 
 .message-list{
     min-height: 73vh;
+    max-height: 73vh;
     margin-bottom: auto;
 }
 

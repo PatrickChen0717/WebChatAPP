@@ -1,28 +1,129 @@
 var profile = {username: "Patrick"};
+var Service = {
+    origin: window.location.origin,
+    getAllRooms : function(){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET",this.origin + "/chat");
+        xhr.send();
+        var action =  new Promise ((resolve,reject) => {
+            xhr.onload = function(){
+                if(xhr.status == 200){
+                    console.log(xhr.responseText);
+                    var obj = JSON.parse(xhr.responseText);
+                    var res = [];
+                    for(var i in obj){
+                        res.push(obj[i]);
+                    }
+                    resolve(res);
+                }
+                else {
+                    var error = new Error(xhr.responseText);
+                    console.log(error);
+                    reject(error);
+                }
+            };
+            xhr.onerror = function(){
+                var error = new Error(xhr.responseText);
+                console.log(error);
+                reject(error);
+            };  
+        });
+        return action;
+    },
+    addRoom: function(data){
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', this.origin + "/chat", true);
+        xhr.setRequestHeader('Content-type', 'application/json');
+        xhr.send(JSON.stringify(data));
+        var action =  new Promise ((resolve,reject) => {
+            xhr.onload = function(){
+                if(xhr.status != 200){
+                    var error = new Error(xhr.responseText);
+                    //console.log(error);
+                    reject(error);
+                }
+            };
+            xhr.onerror = function(){
+                var error = new Error(xhr.responseText);
+                //console.log(error);
+                reject(error);
+            };  
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.response);
+                    resolve(JSON.parse(xhr.response));
+                }
+            }
+        });
+        return action;
+    }
+};
+
 
 function main(){
    // console.log("Entered Main");
-
+    var socket = new WebSocket("ws://localhost:3000");
+    
+   
     var lobby = new Lobby();
     var lobbyView = new LobbyView(lobby);
-    var chatView = new ChatView();
+    var chatView = new ChatView(socket);
     var profileView = new ProfileView();
+    
+    socket.addEventListener('message', (msg) => {
+        var message = JSON.parse(msg.data);
+        
+        lobby.getRoom(message.roomId).addMessage(message.username, message.text);
+    });
 
+    var refreshLobby = function(){
+        Service.getAllRooms().then((newRooms)=>{
+            
+            console.log(lobby.rooms);
+            for(var i=0;i<newRooms.length;i++){
+                // console.log("newRooms:");
+                // console.log(newRooms[i]);
+                if(newRooms[i].id in lobby.rooms){
+                    lobby.rooms[newRooms[i].id].name = newRooms[i].name;
+                    lobby.rooms[newRooms[i].id].image = newRooms[i].image;
+                    lobby.rooms[newRooms[i].id].messages = newRooms[i].messages;
+                }
+                else{
+                    lobby.addRoom(newRooms[i].id, newRooms[i].name, newRooms[i].image, newRooms[i].messages);
+                    //lobby.rooms[i] = new Room(newRooms[i].id,newRooms[i].name,newRooms[i].image,newRooms[i].messages)
+                }
+            }
+        });
+    }
+    refreshLobby();
+    setInterval(refreshLobby,5000);
+
+   
     function renderRoute(){
         var address = window.location.hash;
         //console.log(address);
 
         if(address === "#/"){
             var page_view = document.getElementById("page-view");
-            //console.log("Called renderRoute: index");
+            console.log("Called renderRoute: index");
             emptyDOM (page_view);
+            lobbyView.redrawList();
             page_view.appendChild(lobbyView.elem);
+            
         }
         else if(address.includes("#/chat/")){//"#/chat/room-1"
             var page_view = document.getElementById("page-view");
 
             var address_arr = address.split("/");
-            var extracted_room = lobby.getRoom(address_arr[address_arr.length-1]);
+            var extracted_room;
+
+            if(address_arr[address_arr.length-1].includes("-")){
+                var address_arr = address_arr[address_arr.length-1].split("-");
+                var extracted_room = lobby.getRoom(address_arr[address_arr.length-1]);
+            }else{
+                var extracted_room = lobby.getRoom(address_arr[address_arr.length-1]);
+            }
+            
             if(extracted_room != null){
                 chatView.setRoom(extracted_room);
             }
@@ -39,6 +140,7 @@ function main(){
 
     }
 
+    
     renderRoute();
 
     window.addEventListener("popstate", renderRoute);
@@ -47,6 +149,8 @@ function main(){
     //Test exposure  
     cpen322.export(arguments.callee, {
         renderRoute: renderRoute,
+        refreshLobby: refreshLobby,
+        socket: socket,
         lobby: lobby,
         lobbyView: lobbyView,
         chatView: chatView,
@@ -84,11 +188,11 @@ class Room{
 class Lobby{
     constructor() {
         this.rooms = {
-            0: new Room(0,"Everyone in CPEN400A","assets/everyone-icon.png",[]),
-            1: new Room(1,"minecraft","assets/canucks.png",[]),
-            2: new Room(2,"Canucks","assets/minecraft.jpg",[]),
-            3: new Room(3,"Bibimbap","assets/bibimbap.jpg",[])
-        }
+            // 0: new Room(0,"Everyone in CPEN400A","assets/everyone-icon.png",[]),
+            // 1: new Room(1,"minecraft","assets/canucks.png",[]),
+            // 2: new Room(2,"Canucks","assets/minecraft.jpg",[]),
+            // 3: new Room(3,"Bibimbap","assets/bibimbap.jpg",[])
+        };
 
         //console.log(this.rooms);
     }
@@ -127,15 +231,15 @@ class LobbyView {
                     </li>
                     <li>
                         <img src="assets/minecraft.jpg">
-                        <a href="#/chat/room-1">Minecraft</a>
+                        <a href="#/chat/room-2">Minecraft</a>
                     </li>
                     <li>
                         <img src="assets/canucks.png">
-                        <a href="#/chat/room-1">Canucks</a>
+                        <a href="#/chat/room-3">Canucks</a>
                     </li>
                     <li>
                         <img src="assets/bibimbap.jpg">
-                        <a href="#/chat/room-1">Bibimbap</a>
+                        <a href="#/chat/room-4">Bibimbap</a>
                     </li>
                 </ul>
         
@@ -155,10 +259,15 @@ class LobbyView {
             self.redrawList();
         }
 
+        console.log("rendering list");
+        console.log(this.lobby.rooms); 
         this.redrawList();
 
         this.buttonElem.addEventListener("click",function (){
-            self.lobby.addRoom(self.lobby.rooms.length, self.inputElem.value);
+            Service.addRoom({name: self.inputElem.value, image: "assets/everyone-icon.png"}).then(
+                (result) => { self.lobby.addRoom(result.id, result.name, result.image, result.messages);},
+                (error) => {console.log(error);}
+            );
             self.inputElem.value = '';
         })
     }
@@ -169,6 +278,7 @@ class LobbyView {
 
         emptyDOM(this.listElem);
         for (var i=0; i<Object.keys(this.lobby.rooms).length; i++){
+            console.log(this.lobby.rooms[i]);
             var room_string = `<li>
                                 <img src="`+ Object.keys(this.lobby.rooms)[i].image +`">
                                 <a href="#/chat/`+ Object.keys(this.lobby.rooms)[i] +`">`+Object.keys(this.lobby.rooms)[i].name+`</a>
@@ -179,7 +289,7 @@ class LobbyView {
 };
 
 var ChatView = class {
-    constructor() {
+    constructor(socket) {
         this.elem = createDOM(
         `<div class="content">
             <h4 class="room-name">Everyone in CPEN400A</h4>
@@ -207,6 +317,7 @@ var ChatView = class {
         this.inputElem = this.elem.querySelector("textarea");
         this.buttonElem = this.elem.querySelector("button");
         this.room = null;
+        this.socket = socket;
         var chatview_self = this;
 
         this.buttonElem.addEventListener("click", function() {
@@ -226,6 +337,10 @@ var ChatView = class {
         if(this.room != null){
             //console.log(profile.username +" "+ this.inputElem.value);
             this.room.addMessage(profile.username, this.inputElem.value);
+            
+            var message = {roomId: this.room.id, username: profile.username, text: this.inputElem.value};
+            this.socket.send(JSON.stringify(message));
+
             this.inputElem.value = '';
         }
     }
@@ -311,3 +426,5 @@ function createDOM (htmlString){
     template.innerHTML = htmlString.trim();
     return template.content.firstChild;
 }
+
+/*-------------------Assignment 3------------------------*/

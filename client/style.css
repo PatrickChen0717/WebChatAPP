@@ -192,6 +192,8 @@ img{
 }
 
 .message-list{
+    overflow-y:auto;
+    
     min-height: 73vh;
     max-height: 73vh;
     margin-bottom: auto;

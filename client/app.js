@@ -50,12 +50,24 @@ var Service = {
             };  
             xhr.onreadystatechange = () => {
                 if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log(xhr.response);
                     resolve(JSON.parse(xhr.response));
                 }
             }
         });
         return action;
+    },
+    getLastConversation: function(roomId,before){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET",this.origin + "/chat/"+ roomId +"/messages?before="+ before);
+        xhr.send();
+        var action = new Promise ((resolve,reject) => {
+            xhr.onload = function(){
+                resolve(xhr.responseText);
+            }
+        })
+        return action.then((conversation)=>{
+            return JSON.parse(conversation);
+        });
     }
 };
 
@@ -83,13 +95,13 @@ function main(){
             for(var i=0;i<newRooms.length;i++){
                 // console.log("newRooms:");
                 // console.log(newRooms[i]);
-                if(newRooms[i].id in lobby.rooms){
-                    lobby.rooms[newRooms[i].id].name = newRooms[i].name;
-                    lobby.rooms[newRooms[i].id].image = newRooms[i].image;
-                    lobby.rooms[newRooms[i].id].messages = newRooms[i].messages;
+                if(newRooms[i]._id in lobby.rooms){
+                    lobby.rooms[newRooms[i]._id].name = newRooms[i].name;
+                    lobby.rooms[newRooms[i]._id].image = newRooms[i].image;
+                    lobby.rooms[newRooms[i]._id].messages = newRooms[i].messages;
                 }
                 else{
-                    lobby.addRoom(newRooms[i].id, newRooms[i].name, newRooms[i].image, newRooms[i].messages);
+                    lobby.addRoom(newRooms[i]._id, newRooms[i].name, newRooms[i].image, newRooms[i].messages);
                     //lobby.rooms[i] = new Room(newRooms[i].id,newRooms[i].name,newRooms[i].image,newRooms[i].messages)
                 }
             }
@@ -160,13 +172,16 @@ function main(){
 
 window.addEventListener("load", main);
 
-
 class Room{
     constructor(id, name, image, messages) {
-        this.id = id;
+        this._id = id;
         this.name = name;
         this.image = (image == undefined) ? "assets/everyone-icon.png" : image;
         this.messages = (messages == undefined) ? [] : messages;
+
+        this.getLastConversation = makeConversationLoader(this);
+        this.timestamp = Date.now();
+        this.canLoadConversation = true;
     }
     addMessage(username, text){
         if(text == "" || text.trim().length === 0){
@@ -181,6 +196,13 @@ class Room{
         if(typeof this.onNewMessage == 'function'){
             this.onNewMessage(message);
         }
+    }
+    addConversation(conversation){
+        var conversation_arr = conversation.messages;
+        for(var i=0;i<conversation_arr.length;i++){
+            this.messages.push(conversation_arr[i]);
+        }
+        this.onFetchConversation(conversation);
     }
 };
 
@@ -265,7 +287,7 @@ class LobbyView {
 
         this.buttonElem.addEventListener("click",function (){
             Service.addRoom({name: self.inputElem.value, image: "assets/everyone-icon.png"}).then(
-                (result) => { self.lobby.addRoom(result.id, result.name, result.image, result.messages);},
+                (result) => { self.lobby.addRoom(result._id, result.name, result.image, result.messages);},
                 (error) => {console.log(error);}
             );
             self.inputElem.value = '';
@@ -331,6 +353,12 @@ var ChatView = class {
                 }
             }
         });
+
+        this.chatElem.addEventListener('wheel', (event) => {
+            if(event.deltaY < 0 && this.chatElem.scrollTop <= 0 && this.room.canLoadConversation == true){
+				    this.room.getLastConversation.next();
+			}
+        });
     }
     sendMessage(){
         //console.log("send message");
@@ -338,7 +366,7 @@ var ChatView = class {
             //console.log(profile.username +" "+ this.inputElem.value);
             this.room.addMessage(profile.username, this.inputElem.value);
             
-            var message = {roomId: this.room.id, username: profile.username, text: this.inputElem.value};
+            var message = {roomId: this.room._id, username: profile.username, text: this.inputElem.value};
             this.socket.send(JSON.stringify(message));
 
             this.inputElem.value = '';
@@ -380,6 +408,37 @@ var ChatView = class {
                 this.chatElem.appendChild(createDOM(message_string));
             }
         }
+
+        this.room.onFetchConversation = (conversation) => {
+            console.log(conversation)
+            var scroll_below = this.chatElem.scrollHeight;
+
+            var message_html = "";
+
+            for(var i=0;i<conversation.messages.length;i++){
+                if(conversation.messages[i].username == profile.username){
+                    message_html = message_html + `<div class="message my-message">
+                                            <span class="message-user">`+ conversation.messages[i].username +`</span>
+                                            <span class="message-text">`+ conversation.messages[i].text +`</span>
+                                        </div>`       
+                                        
+                   // message_html = message_string + message_html;
+                }
+                else{
+                    message_html = message_html + `<div class="message">
+                                            <span class="message-user">`+ conversation.messages[i].username +`</span>
+                                            <span class="message-text">`+ conversation.messages[i].text +`</span>
+                                        </div>`       
+                                        
+                   // message_html = message_string + message_html;
+                }
+            }
+
+            this.chatElem.innerHTML = message_html + this.chatElem.innerHTML;
+
+			var scroll_above = this.chatElem.scrollHeight;
+			this.chatElem.scrollTop = scroll_above - scroll_below;
+        }
     }
 };
 
@@ -412,7 +471,30 @@ var ProfileView = class {
     }
 };
 
+function* makeConversationLoader(room){
+    var last_conversation = room;
 
+    while(room.canLoadConversation == true){
+        yield new Promise ((resolve,reject) => {
+            room.canLoadConversation = false;
+           
+            Service.getLastConversation(room.id, last_conversation.timestamp).then((new_last) =>{
+                last_conversation = new_last;
+                
+                if(last_conversation == null){
+                    room.canLoadConversation = false;
+                    resolve(null);
+                }
+                else{
+                    room.canLoadConversation = true;
+                    room.addConversation(last_conversation);
+                    resolve(last_conversation);
+                }
+            });
+        });
+
+    }
+}
 
 /*-------------------Helper Function--------------------*/
 

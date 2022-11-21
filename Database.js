@@ -80,7 +80,13 @@ Database.prototype.getRoom = function(room_id){
                     
                 });
                 
-                resolve(room);
+                if(room != null){
+                    resolve(room);
+                }
+                else{
+                    resolve(room);
+                }
+                
             }
             else{
                 reject("DB access error");

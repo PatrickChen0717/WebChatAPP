@@ -71,6 +71,30 @@ var Service = {
     }
 };
 
+function* makeConversationLoader(room){
+    var last_conversation = room;
+
+    while(room.canLoadConversation == true){
+        yield new Promise ((resolve,reject) => {
+            room.canLoadConversation = false;
+           
+            Service.getLastConversation(room.id, last_conversation.timestamp).then((new_last) =>{
+                last_conversation = new_last;
+                
+                if(last_conversation == null){
+                    room.canLoadConversation = false;
+                    resolve(null);
+                }
+                else{
+                    room.canLoadConversation = true;
+                    room.addConversation(last_conversation);
+                    resolve(last_conversation);
+                }
+            });
+        });
+
+    }
+}
 
 function main(){
    // console.log("Entered Main");
@@ -130,10 +154,10 @@ function main(){
             var extracted_room;
 
             if(address_arr[address_arr.length-1].includes("-")){
-                var address_arr = address_arr[address_arr.length-1].split("-");
-                var extracted_room = lobby.getRoom(address_arr[address_arr.length-1]);
+                //var address_arr = address_arr[address_arr.length-1].split("-");
+                var extracted_room = lobby.getRoom(address_arr[2]);
             }else{
-                var extracted_room = lobby.getRoom(address_arr[address_arr.length-1]);
+                var extracted_room = lobby.getRoom(address_arr[2]);
             }
             
             if(extracted_room != null){
@@ -179,9 +203,11 @@ class Room{
         this.image = (image == undefined) ? "assets/everyone-icon.png" : image;
         this.messages = (messages == undefined) ? [] : messages;
 
-        this.getLastConversation = makeConversationLoader(this);
+        
         this.timestamp = Date.now();
         this.canLoadConversation = true;
+
+        this.getLastConversation = makeConversationLoader(this);
     }
     addMessage(username, text){
         if(text == "" || text.trim().length === 0){
@@ -355,8 +381,10 @@ var ChatView = class {
         });
 
         this.chatElem.addEventListener('wheel', (event) => {
-            if(event.deltaY < 0 && this.chatElem.scrollTop <= 0 && this.room.canLoadConversation == true){
-				    this.room.getLastConversation.next();
+            console.log(chatview_self.room);
+            
+            if(event.deltaY < 0 && this.chatElem.scrollTop <= 0 && chatview_self.room.canLoadConversation == true){
+				this.room.getLastConversation.next();
 			}
         });
     }
@@ -374,6 +402,8 @@ var ChatView = class {
     }
     setRoom(room){
         this.room = room;   
+        console.log("Check:==================");
+        console.log(room);
         this.titleElem.innerHTML = this.room.name;
         //console.log(this.room.name);
 
@@ -471,30 +501,7 @@ var ProfileView = class {
     }
 };
 
-function* makeConversationLoader(room){
-    var last_conversation = room;
 
-    while(room.canLoadConversation == true){
-        yield new Promise ((resolve,reject) => {
-            room.canLoadConversation = false;
-           
-            Service.getLastConversation(room.id, last_conversation.timestamp).then((new_last) =>{
-                last_conversation = new_last;
-                
-                if(last_conversation == null){
-                    room.canLoadConversation = false;
-                    resolve(null);
-                }
-                else{
-                    room.canLoadConversation = true;
-                    room.addConversation(last_conversation);
-                    resolve(last_conversation);
-                }
-            });
-        });
-
-    }
-}
 
 /*-------------------Helper Function--------------------*/
 

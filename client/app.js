@@ -1,4 +1,27 @@
 var profile = {username: "Patrick"};
+
+function msg_cleanup(msg){
+	if(msg.split("").includes("<") && msg.split("").includes(">")){
+        var msg_arr = msg.split("");
+		var clean_msg;
+		for(var i=0; i<msg_arr.length; i++){
+			if(msg_arr[i] == ">"){
+				clean_msg = clean_msg + "#greater";
+			}
+			else if(msg_arr[i] == "<"){
+				clean_msg = clean_msg + "#less";
+			}
+			else{
+				clean_msg = clean_msg + msg_arr[i];
+			}
+		}
+		return clean_msg;
+	}
+	else{
+		return msg;
+	}
+}
+
 var Service = {
     origin: window.location.origin,
     getAllRooms : function(){
@@ -9,7 +32,13 @@ var Service = {
             xhr.onload = function(){
                 if(xhr.status == 200){
                     console.log(xhr.responseText);
-                    var obj = JSON.parse(xhr.responseText);
+                    var obj;
+                        try {
+                            obj = JSON.parse(xhr.responseText);
+                        }catch(e){
+                            obj = null;
+                        }
+
                     var res = [];
                     for(var i in obj){
                         res.push(obj[i]);
@@ -62,11 +91,28 @@ var Service = {
         xhr.send();
         var action = new Promise ((resolve,reject) => {
             xhr.onload = function(){
-                resolve(xhr.responseText);
+                resolve(JSON.parse(xhr.response));
             }
         })
         return action.then((conversation)=>{
             return JSON.parse(conversation);
+        });
+    },
+    getProfile: function(){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET",this.origin + "/profile");
+        xhr.send();
+        var action = new Promise ((resolve,reject) => {
+            xhr.onload = function(){
+                console.log("==========getprofile==========");
+                console.log(JSON.parse(xhr.responseText));
+                resolve(JSON.parse(xhr.responseText));
+            }
+        })
+        return action.then((result)=>{
+            console.log("username: "+ result.username);
+            profile.username = result.username;
+            return result;
         });
     }
 };
@@ -98,7 +144,9 @@ function* makeConversationLoader(room){
 
 function main(){
    // console.log("Entered Main");
-    var socket = new WebSocket("ws://localhost:3000");
+    //profile.username = Service.getProfile();
+   
+    var socket = new WebSocket("ws://localhost:8000");
     
    
     var lobby = new Lobby();
@@ -131,8 +179,7 @@ function main(){
             }
         });
     }
-    refreshLobby();
-    setInterval(refreshLobby,5000);
+
 
    
     function renderRoute(){
@@ -178,7 +225,8 @@ function main(){
 
     
     renderRoute();
-
+    refreshLobby();
+    setInterval(refreshLobby,5000);
     window.addEventListener("popstate", renderRoute);
 
 
@@ -198,7 +246,7 @@ window.addEventListener("load", main);
 
 class Room{
     constructor(id, name, image, messages) {
-        this._id = id;
+        this.id = id;
         this.name = name;
         this.image = (image == undefined) ? "assets/everyone-icon.png" : image;
         this.messages = (messages == undefined) ? [] : messages;
@@ -214,13 +262,19 @@ class Room{
             return;
         }
         else{
-            var message = {username:username, text:text};
-            //console.log("new message: "+ username +" "+ text);
+            var message = {username:username, text:msg_cleanup(text)};
+            console.log("===============addMessage===============");
+            console.log("new message: "+ username +" text:"+ text);
+            console.log("===============add clean Message===============");
+            console.log("new message: "+ username +" text:"+ message.text);
+            
             this.messages.push(message);
+
+            
         }
 
-        if(typeof this.onNewMessage == 'function'){
-            this.onNewMessage(message);
+        if(this.onNewMessage != undefined){
+            this.onNewMessage({username:username, text:msg_cleanup(text)});
         }
     }
     addConversation(conversation){
@@ -409,11 +463,12 @@ var ChatView = class {
 
         var chatview_self = this;
         this.room.onNewMessage = function (message){
-            //console.log("called onNewMessage");
-              //console.log("1:"+ profile.username +"    "+this.room.messages[i].text);
+            console.log("called onNewMessage");
+            //console.log("1:"+ profile.username +"    "+this.room.messages[i].text);
+
             var message_string = `<div class="message my-message">
                                     <span class="message-user">`+ message.username +`</span>
-                                    <span class="message-text">`+ message.text +`</span>
+                                    <span class="message-text">`+ msg_cleanup(message.text) +`</span>
                                 </div>`    
             chatview_self.chatElem.appendChild(createDOM(message_string));
         };
@@ -424,7 +479,7 @@ var ChatView = class {
             if(this.room.messages[i].username == profile.username){
                 var message_string = `<div class="message my-message">
                                         <span class="message-user">`+ this.room.messages[i].username +`</span>
-                                        <span class="message-text">`+ this.room.messages[i].text +`</span>
+                                        <span class="message-text">`+ msg_cleanup(this.room.messages[i].text) +`</span>
                                     </div>`       
                                     //console.log(message_string);
                 this.chatElem.appendChild(createDOM(message_string));
@@ -432,7 +487,7 @@ var ChatView = class {
             else{
                 var message_string = `<div class="message">
                                         <span class="message-user">`+ this.room.messages[i].username +`</span>
-                                        <span class="message-text">`+ this.room.messages[i].text +`</span>
+                                        <span class="message-text">`+ msg_cleanup(this.room.messages[i].text) +`</span>
                                     </div>`       
                                     //console.log(message_string);
                 this.chatElem.appendChild(createDOM(message_string));
@@ -445,17 +500,17 @@ var ChatView = class {
 
             var message_html = "";
 
+            
             for(var i=0;i<conversation.messages.length;i++){
                 if(conversation.messages[i].username == profile.username){
-                    message_html = message_html + `<div class="message my-message">
-                                            <span class="message-user">`+ conversation.messages[i].username +`</span>
-                                            <span class="message-text">`+ conversation.messages[i].text +`</span>
-                                        </div>`       
-                                        
+                        message_html = message_html + `<div class="message my-message">
+                                                <span class="message-user">`+ conversation.messages[i].username +`</span>
+                                                <span class="message-text">`+ msg_cleanup(conversation.messages[i].text) +`</span>
+                                            </div>`       
                    // message_html = message_string + message_html;
                 }
                 else{
-                    message_html = message_html + `<div class="message">
+                        message_html = message_html + `<div class="message">
                                             <span class="message-user">`+ conversation.messages[i].username +`</span>
                                             <span class="message-text">`+ conversation.messages[i].text +`</span>
                                         </div>`       

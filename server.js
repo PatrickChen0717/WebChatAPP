@@ -219,18 +219,10 @@ app.route('/logout')
 })
 
 
-app.get('/app.js', sessionManager.middleware, (req, res, next) => {
-    res.sendFile(clientApp + "/app.js");
-});
-app.get('/index', sessionManager.middleware, (req, res, next) => {
-    res.sendFile(clientApp + "/index.html");
-});
-app.get('/index.html', sessionManager.middleware, (req, res, next) => {
-    res.sendFile(clientApp + "/index.html");
-});
-app.get('/', sessionManager.middleware, (req, res, next) => {
-    res.sendFile(clientApp + "/index.html");
-});
+app.get('/app.js', sessionManager.middleware);
+app.get('/index', sessionManager.middleware);
+app.get('/index.html', sessionManager.middleware);
+app.get('/', sessionManager.middleware);
 
 app.use(errorHandler);
 
